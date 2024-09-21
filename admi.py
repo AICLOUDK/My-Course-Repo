@@ -2,18 +2,13 @@ class Question(models.Model):
     Foreign key to course
     Question text
     Question grade
-
-
 class Question(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     content = models.CharField(max_length=200)
     grade = models.IntegerField(default=50)
-
-    def __str__(self):
+def __str__(self):
         return "Question: " + self.content
-
-
-    # method to calculate if the learner gets the score of the question
+# method to calculate if the learner gets the score of the question
     def is_get_score(self, selected_ids):
         all_answers = self.choice_set.filter(is_correct=True).count()
         selected_correct = self.choice_set.filter(is_correct=True, id__in=selected_ids).count()
@@ -21,25 +16,14 @@ class Question(models.Model):
             return True
         else:
             return False
-
-
-
-
 class Choice(models.Model):
     Foreign key to question
     Choice content as text
     Is choice correct as boolean
-
-
-
 class Choice(models.Model):
     question = models.ForeignKey(Question, on_delete=models.CASCADE)
     content = models.CharField(max_length=200)
     is_correct = models.BooleanField(default=False)
-
-
-
-
 import sys
 from django.utils.timezone import now
 try:
@@ -47,11 +31,8 @@ try:
 except Exception:
     print("There was an error loading django modules. Do you have django installed?")
     sys.exit()
-
 from django.conf import settings
 import uuid
-
-
 # Instructor model
 class Instructor(models.Model):
     user = models.ForeignKey(
@@ -63,8 +44,6 @@ class Instructor(models.Model):
 
     def __str__(self):
         return self.user.username
-
-
 # Learner model
 class Learner(models.Model):
     user = models.ForeignKey(
@@ -92,8 +71,6 @@ class Learner(models.Model):
     def __str__(self):
         return self.user.username + "," + \
                self.occupation
-
-
 # Course model
 class Course(models.Model):
     name = models.CharField(null=False, max_length=30, default='online course')
@@ -108,16 +85,12 @@ class Course(models.Model):
     def __str__(self):
         return "Name: " + self.name + "," + \
                "Description: " + self.description
-
-
 # Lesson model
 class Lesson(models.Model):
     title = models.CharField(max_length=200, default="title")
     order = models.IntegerField(default=0)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     content = models.TextField()
-
-
 # Enrollment model
 # <HINT> Once a user enrolled a class, an enrollment entry should be created between the user and course
 # And we could use the enrollment to track information such as exam submissions
@@ -141,8 +114,7 @@ class Question(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     content = models.CharField(max_length=200)
     grade = models.IntegerField(default=50)
-
-    def __str__(self):
+ def __str__(self):
         return "Question: " + self.content
 
     def is_get_score(self, selected_ids):
@@ -161,16 +133,9 @@ class Choice(models.Model):
 class Submission(models.Model):
     enrollment = models.ForeignKey(Enrollment, on_delete=models.CASCADE)
     choices = models.ManyToManyField(Choice)
-
-
-
 class Class_Name(admin.StackedInline):
     model = Model_Name
     extra = 2
-
-
-
-
 class ChoiceInline(admin.StackedInline):
     model = Choice
     extra = 2
@@ -178,67 +143,43 @@ class ChoiceInline(admin.StackedInline):
 class QuestionInline(admin.StackedInline):
     model = Question
     extra = 2
-
-
-
-
 class QuestionAdmin(admin.ModelAdmin):
     inlines = [Question_sub_content]
     list_display = ['content']
-
-
 class QuestionAdmin(admin.ModelAdmin):
     inlines = [ChoiceInline]
     list_display = ['content']
-
-
 admin.site.register(Model1, Model2)
 admin.site.register(Model3)
-
-
-
 admin.site.register(Question, QuestionAdmin)
 admin.site.register(Choice)
 admin.site.register(Submission)
-
-
-
 from django.contrib import admin
 # <HINT> Import any new Models here
 from .models import Course, Lesson, Instructor, Learner, Question, Choice, Submission
-
 # <HINT> Register QuestionInline and ChoiceInline classes here
-
-
 class LessonInline(admin.StackedInline):
     model = Lesson
     extra = 5
-
 class ChoiceInline(admin.StackedInline):
     model = Choice
     extra = 2
-
 class QuestionInline(admin.StackedInline):
     model = Question
     extra = 2
-
 # Register your models here.
 class CourseAdmin(admin.ModelAdmin):
     inlines = [LessonInline]
     list_display = ('name', 'pub_date')
     list_filter = ['pub_date']
     search_fields = ['name', 'description']
-
 class QuestionAdmin(admin.ModelAdmin):
     inlines = [ChoiceInline]
     list_display = ['content']
-
 class LessonAdmin(admin.ModelAdmin):
     list_display = ['title']
 
-
 # <HINT> Register Question and Choice models here
-
 admin.site.register(Course, CourseAdmin)
 admin.site.register(Lesson, LessonAdmin)
 admin.site.register(Instructor)
